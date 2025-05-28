@@ -1,0 +1,14 @@
+#!/bin/bash
+
+day=$(date +%d)
+day=$((10#$day))
+
+TRASH_PATH="${XDG_DATA_HOME:-$HOME/.local/share}/Trash"
+FILES_DIR="$TRASH_PATH/files"
+INFO_DIR="$TRASH_PATH/info"
+
+if [ "$day" -eq 15 ]; then
+    [ -d "$FILES_DIR" ] && rm -rf "$FILES_DIR"/*
+    [ -d "$INFO_DIR" ] && rm -rf "$INFO_DIR"/*
+fi
+exit 0
