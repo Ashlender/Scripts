@@ -1,0 +1,16 @@
+#!/bin/bash
+echo -e "\033[43m Updating system..."
+sudo apt update && sudo apt upgrade -y
+echo -e "\033[42m System updated" 
+
+echo -e "\033[43m Installing web packages... " 
+sudo apt install curl git wget -y
+echo -e "\033[42m Packages installed." 
+
+echo -e "\033[43m"
+
+echo -e "\033[42m"
+
+echo -e "\033[43m Installing utils..." 
+sudo apt install vim btop gnome-tweaks gnome-shell-extension-manager -y
+echo -e "\033[42m Utils installed." 
