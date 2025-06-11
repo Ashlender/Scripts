@@ -1,16 +1,50 @@
 #!/bin/bash
-echo -e "\033[43m Updating system..."
-sudo apt update && sudo apt upgrade -y
-echo -e "\033[42m System updated" 
+set -e 
 
-echo -e "\033[43m Installing web packages... " 
-sudo apt install curl git wget -y
-echo -e "\033[42m Packages installed." 
+YELLOW="\033[43m"
+GREEN="\033[42m"
+RESET="\033[0m"
 
-echo -e "\033[43m"
+log() {
+    echo -e "${1}${2}${RESET}"
+}
 
-echo -e "\033[42m"
+update_system() {
+    log "$YELLOW" "Updating system..."
+    sudo apt update && sudo apt upgrade -y
+    log "$GREEN" "System updated."
+}
 
-echo -e "\033[43m Installing utils..." 
-sudo apt install vim btop gnome-tweaks gnome-shell-extension-manager -y
-echo -e "\033[42m Utils installed." 
+install_base_packages() {
+    log "$YELLOW" "Installing base packages..."
+    sudo apt install -y curl git wget gpg apt-transport-https software-properties-common gnupg
+    log "$GREEN" "Base packages installed."
+}
+
+install_apps() {
+    log "$YELLOW" "Installing apps..."
+
+    wget -qO- https://packages.microsoft.com/keys/microsoft.asc | gpg --dearmor > packages.microsoft.gpg
+    sudo install -o root -g root -m 644 packages.microsoft.gpg /usr/share/keyrings/
+    echo "deb [arch=amd64 signed-by=/usr/share/keyrings/packages.microsoft.gpg] https://packages.microsoft.com/repos/code stable main" | sudo tee /etc/apt/sources.list.d/vscode.list > /dev/null
+    rm -f packages.microsoft.gpg
+    sudo apt update
+    sudo apt install -y code
+
+    wget https://github.com/obsidianmd/obsidian-releases/releases/latest/download/obsidian_amd64.deb -O obsidian.deb
+    sudo apt install -y ./obsidian.deb
+    rm -f obsidian.deb
+
+    log "$GREEN" "Apps installed."
+}
+
+install_utils() {
+    log "$YELLOW" "Installing utilities (vim, btop, gnome tweaks)..."
+    sudo apt install -y vim btop gnome-tweaks gnome-shell-extension-manager
+    log "$GREEN" "Utilities installed."
+}
+
+update_system
+install_base_packages
+install_apps
+install_utils
