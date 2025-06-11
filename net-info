@@ -1,0 +1,38 @@
+#!/bin/bash
+GREEN="\033[32m"
+RED="\033[31m"
+CYAN="\033[36m"
+RESET="\033[0m"
+
+echo "External IP: $(curl -s ifconfig.me)"
+echo "Local IP: $(hostname -I | awk '{print $1}')"
+echo "DNS: $(systemd-resolve --status | grep 'DNS Servers' | awk '{print $3}' | head -n1)"
+echo "Ping to 8.8.8.8:"
+ping -c 2 8.8.8.8 | tail -2
+
+SERVICES=(
+  "YouTube:youtube.com:443"
+  "Twitter:twitter.com:443"
+  "Google:google.com:443"
+  "Telegram:149.154.167.99:443"
+  "GitHub:github.com:443"
+  "Cloudflare:1.1.1.1:53"
+  "Twitch:twitch.tv:443"
+  "Discord:discord.com:443"
+)
+
+printf "%-15s %-25s %-7s %-10s\n" "Service" "Host" "Port" "Status"
+echo "-------------------------------------------------------------"
+
+for entry in "${SERVICES[@]}"; do
+  IFS=":" read -r name host port <<< "$entry"
+
+  timeout 2 bash -c "</dev/tcp/$host/$port" &>/dev/null
+  if [ $? -eq 0 ]; then
+    STATUS="${GREEN}OK${RESET}"
+  else
+    STATUS="${RED}FAIL${RESET}"
+  fi
+
+  printf "%-15s %-25s %-7s %-10b\n" "$name" "$host" "$port" "$STATUS"
+done
